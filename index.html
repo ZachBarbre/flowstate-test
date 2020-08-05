@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Can I use the Office of Water Prediction API</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.27.0/moment.min.js" 
+        integrity="sha512-rmZcZsyhe0/MAjquhTgiUcb4d9knaFc7b5xAfju483gbEXTkeJRUMIPk6s3ySZMYUHEcjKbjLjyddGWMrNEvZg==" 
+        crossorigin="anonymous">
+    </script>
+</head>
+<body>
+    <h1>Predicted Flow at Noon in the Devil's Racecourse</h1>
+    <ul id="flow-list"></ul>
+    <script>
+        const get = async () => {
+            const response = await fetch('https://nwmdata.nohrsc.noaa.gov/latest/forecasts/medium_range/streamflow?station_id=2048205');
+            const data = await response.json();
+            return data;
+        }
+        
+        get().then(riverData => {
+            const flowArray = riverData[0].data;
+            const noonFlow = flowArray.filter(flow => flow['forecast-time'].split(' ')[1] === '12:00:00');
+            const flowList = document.querySelector('#flow-list');
+            noonFlow.forEach(flow => {
+                console.log(flow)
+                const date = moment(flow['forecast-time']).format('ddd, MMM Do')
+                const cfh = flow.value;
+                const flowListItem = document.createElement('li');
+                flowListItem.innerText = `${date} - ${flow.value} ft^3/sec`;
+                flowList.appendChild(flowListItem);
+            })
+        }
+        )
+
+    </script>
+</body>
+</html>
